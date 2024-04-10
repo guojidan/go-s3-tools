@@ -2,7 +2,10 @@ module go-s3-tools
 
 go 1.22.1
 
-require github.com/minio/minio-go/v7 v7.0.69
+require (
+	github.com/minio/minio-go/v7 v7.0.69
+	github.com/sirupsen/logrus v1.9.3
+)
 
 require (
 	github.com/dustin/go-humanize v1.0.1 // indirect

@@ -4,8 +4,9 @@ import (
 	"bufio"
 	"fmt"
 	"go-s3-tools/pkg/client"
-	"log"
 	"os"
+
+	"github.com/sirupsen/logrus"
 )
 
 func Prepare_test_data(minioClient *client.Client, bucket_name *string, file_path *string) error {
@@ -24,7 +25,7 @@ func Prepare_test_data(minioClient *client.Client, bucket_name *string, file_pat
 
 	file, err := os.Create(*file_path)
 	if err != nil {
-		log.Fatalln("create file err {}, err: {}", file_path, err)
+		logrus.Fatalln("create file err {}, err: {}", file_path, err)
 		return err
 	}
 	defer file.Close()
@@ -35,14 +36,41 @@ func Prepare_test_data(minioClient *client.Client, bucket_name *string, file_pat
 		object_name := object_base_name + fmt.Sprintf("%d", x)
 		_, err = writer.WriteString(object_name + "\n")
 		if err != nil {
-			fmt.Println("cann't write data to file: ", err)
+			logrus.Fatalln("cann't write data to file: ", err)
 			return err
 		}
 		minioClient.Put_object(file_path, bucket_name, &object_name)
 	}
 	err = writer.Flush()
 	if err != nil {
-		fmt.Println("cann't flush buffer:", err)
+		logrus.Fatalln("cann't flush buffer:", err)
+		return err
+	}
+
+	return nil
+}
+
+func Write_data(file_path *string) error {
+	file, err := os.Create(*file_path)
+	if err != nil {
+		logrus.Fatalln("create file err {}, err: {}", file_path, err)
+		return err
+	}
+	defer file.Close()
+	writer := bufio.NewWriter(file)
+	data := []string {"1", "2", "3"}
+
+	for _, line := range data {
+		_, err = writer.WriteString(line + "\n")
+		if err != nil {
+			logrus.Fatalln("cann't write data to file: ", err)
+			return err
+		}
+	}
+
+	err = writer.Flush()
+	if err != nil {
+		logrus.Fatalln("cann't flush buffer:", err)
 		return err
 	}
 

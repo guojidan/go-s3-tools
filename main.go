@@ -3,19 +3,26 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log"
 	"os"
 	"sync"
 
 	"go-s3-tools/pkg/client"
 	"go-s3-tools/pkg/file"
 	"go-s3-tools/pkg/operation"
+
+	"github.com/sirupsen/logrus"
 )
 
 func test_func(minioClient *client.Client) {
-	file_path := "/root/code/go/go-s3-tools/go.mod"
+	file_path := "./test_file"
 	bucket_name := "testbucket"
 	obj_name := "testobj"
+
+	err := file.Write_data(&file_path)
+	if err != nil {
+		logrus.Fatalln("write test data failed: {}", err)
+		return
+	}
 
 	// check if the bucket exists
 	exist, err := minioClient.Bucket_exist(&bucket_name)
@@ -51,7 +58,7 @@ func run(minioClient *client.Client, bucket_name *string, file_path *string) {
 	}
 
 	if !exist {
-		log.Fatalln("bucket don't exist, please check")
+		logrus.Fatalln("bucket don't exist, please check")
 		return
 	}
 
@@ -79,6 +86,7 @@ func main() {
 	secretAccessKey := flag.String("secretAccessKey", "", "secretAccessKey")
 	bukcetName := flag.String("bukcetName", "", "bukcetName")
 	filePath := flag.String("filePath", "", "remove object name list")
+	release := flag.Bool("release", false, "release, don't output debug log")
 	test := flag.Bool("test", false, "test if s3 is available")
 	need_prepare_data := flag.Bool("need_prepare_data", false, "update 1000 object")
 	list_bucket := flag.Bool("list_bucket", false, "list bucket object")
@@ -92,8 +100,14 @@ func main() {
 	flag.Parse()
 
 	if *endpoint == "" || *accessKeyID == "" || *secretAccessKey == "" {
-		log.Fatalln("args err, please run '-h' check usage")
+		logrus.Fatalln("args err, please run '-h' check usage")
 		return
+	}
+
+	if *release {
+		logrus.SetLevel(logrus.FatalLevel)
+	} else {
+		logrus.SetLevel(logrus.DebugLevel)
 	}
 
 	minioClient, err := client.NewClient(endpoint, accessKeyID, secretAccessKey)
@@ -117,5 +131,5 @@ func main() {
 
 	run(minioClient, bukcetName, filePath)
 
-	log.Println("finish op")
+	logrus.Infoln("finish op")
 }

@@ -2,9 +2,10 @@ package file
 
 import (
 	"bufio"
-	"log"
 	"os"
 	"sync"
+
+	"github.com/sirupsen/logrus"
 )
 
 func Read_line(ch chan<- string, wg *sync.WaitGroup, file_path *string) {
@@ -13,7 +14,7 @@ func Read_line(ch chan<- string, wg *sync.WaitGroup, file_path *string) {
 
 	file, err := os.Open(*file_path)
 	if err != nil {
-		log.Panicln("Can not open file {}, err: {}", file_path, err)
+		logrus.Fatalln("Can not open file {}, err: {}", file_path, err)
 	}
 	defer file.Close()
 
@@ -22,12 +23,12 @@ func Read_line(ch chan<- string, wg *sync.WaitGroup, file_path *string) {
 	for scanner.Scan() {
 		line := scanner.Text()
 		ch <- line
-		log.Println(line)
+		logrus.Debugln(line)
 	}
 
 	// check if scanner have err
 	if err := scanner.Err(); err != nil {
-		log.Println("scan file err: {}", err)
+		logrus.Fatalln("scan file err: {}", err)
 		return
 	}
 }

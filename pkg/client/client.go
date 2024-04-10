@@ -2,11 +2,11 @@ package client
 
 import (
 	"context"
-	"log"
 	"os"
 
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
+	"github.com/sirupsen/logrus"
 )
 
 type Client struct {
@@ -25,10 +25,8 @@ func NewClient(endpoint *string, accessKeyID *string, secretAccessKey *string) (
 	})
 
 	if err != nil {
-		log.Fatalln(err)
+		logrus.Fatalln(err)
 	}
-
-	log.Printf("%#v\n", minioClient)
 
 	client.Client = minioClient
 
@@ -38,11 +36,11 @@ func NewClient(endpoint *string, accessKeyID *string, secretAccessKey *string) (
 func (client Client) Bucket_exist(bucket_name *string) (bool, error) {
 	exist, err := client.BucketExists(context.Background(), *bucket_name)
 	if err != nil {
-		log.Println(err)
+		logrus.Fatalln(err)
 		return false, err
 	}
 	if exist {
-		log.Println("Bucket found")
+		logrus.Debugln("Bucket found")
 	}
 
 	return exist, err
@@ -51,7 +49,7 @@ func (client Client) Bucket_exist(bucket_name *string) (bool, error) {
 func (client Client) Make_bucket(bucket_name *string) error {
 	err := client.MakeBucket(context.Background(), *bucket_name, minio.MakeBucketOptions{Region: "", ObjectLocking: true})
 	if err != nil {
-		log.Fatalln(err)
+		logrus.Fatalln(err)
 		return err
 	}
 
@@ -61,23 +59,23 @@ func (client Client) Make_bucket(bucket_name *string) error {
 func (client Client) Put_object(file_path *string, bucket_name *string, obj_name *string) error {
 	file, err := os.Open(*file_path)
 	if err != nil {
-		log.Println(err)
+		logrus.Fatalln(err)
 		return err
 	}
 	defer file.Close()
 
 	fileStat, err := file.Stat()
 	if err != nil {
-		log.Println(err)
+		logrus.Fatalln(err)
 		return err
 	}
 
 	uploadInfo, err := client.PutObject(context.Background(), *bucket_name, *obj_name, file, fileStat.Size(), minio.PutObjectOptions{ContentType: "application/octet-stream"})
 	if err != nil {
-		log.Println(err)
+		logrus.Fatalln(err)
 		return err
 	}
-	log.Println("Successfully uploaded bytes: ", uploadInfo)
+	logrus.Debugln("Successfully uploaded bytes: ", uploadInfo)
 	return nil
 }
 
@@ -92,10 +90,10 @@ func (client Client) List_object(bucket_name *string, prefix *string) error {
 	})
 	for object := range objectCh {
 		if object.Err != nil {
-			log.Println(object.Err)
+			logrus.Fatalln(object.Err)
 			return object.Err
 		}
-		log.Println(object.Key)
+		logrus.Debugln(object.Key)
 	}
 
 	return nil
@@ -107,7 +105,7 @@ func (client Client) Remove_object(bucket_name *string, obj_name *string) error 
 
 	// ignore err, continue!
 	if err != nil {
-		log.Fatalln(err)
+		logrus.Fatalln(err)
 	}
 
 	return nil
