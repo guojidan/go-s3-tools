@@ -86,7 +86,7 @@ func main() {
 	secretAccessKey := flag.String("secretAccessKey", "", "secretAccessKey")
 	bukcetName := flag.String("bukcetName", "", "bukcetName")
 	filePath := flag.String("filePath", "", "remove object name list")
-	release := flag.Bool("release", false, "release, don't output debug log")
+	debug := flag.Bool("debug", false, "debug, will output debug log")
 	test := flag.Bool("test", false, "test if s3 is available")
 	need_prepare_data := flag.Bool("need_prepare_data", false, "update 1000 object")
 	list_bucket := flag.Bool("list_bucket", false, "list bucket object")
@@ -104,10 +104,10 @@ func main() {
 		return
 	}
 
-	if *release {
-		logrus.SetLevel(logrus.FatalLevel)
-	} else {
+	if *debug {
 		logrus.SetLevel(logrus.DebugLevel)
+	} else {
+		logrus.SetLevel(logrus.FatalLevel)
 	}
 
 	minioClient, err := client.NewClient(endpoint, accessKeyID, secretAccessKey)

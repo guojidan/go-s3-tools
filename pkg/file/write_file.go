@@ -58,7 +58,7 @@ func Write_data(file_path *string) error {
 	}
 	defer file.Close()
 	writer := bufio.NewWriter(file)
-	data := []string {"1", "2", "3"}
+	data := []string{"1", "2", "3"}
 
 	for _, line := range data {
 		_, err = writer.WriteString(line + "\n")
