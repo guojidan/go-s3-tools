@@ -6,6 +6,8 @@ Usage of go-s3-tools:
         accessKeyID
   -bukcetName string
         bukcetName
+  -debug
+        debug, will output debug log
   -endpoint string
         endpoint for storage
   -filePath string
