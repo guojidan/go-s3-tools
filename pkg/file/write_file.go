@@ -39,7 +39,8 @@ func Prepare_test_data(minioClient *client.Client, bucket_name *string, file_pat
 			logrus.Fatalln("cann't write data to file: ", err)
 			return err
 		}
-		minioClient.Put_object(file_path, bucket_name, &object_name)
+		// ignore error info
+		go minioClient.Put_object(file_path, bucket_name, &object_name)
 	}
 	err = writer.Flush()
 	if err != nil {
