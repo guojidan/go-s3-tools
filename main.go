@@ -50,7 +50,7 @@ func test_func(minioClient *client.Client) {
 	}
 }
 
-func run(minioClient *client.Client, bucket_name *string, file_path *string) {
+func run(minioClient *client.Client, bucket_name *string, file_path *string, num_thread int) {
 	// check if the bucket exists
 	exist, err := minioClient.Bucket_exist(bucket_name)
 	if err != nil {
@@ -69,7 +69,6 @@ func run(minioClient *client.Client, bucket_name *string, file_path *string) {
 	wg.Add(1)
 	go file.Read_line(ch, &wg, file_path)
 
-	num_thread := 3
 	wg.Add(num_thread)
 	for num_thread > 0 {
 		go operation.Remove_object(ch, &wg, minioClient, bucket_name)
@@ -91,6 +90,7 @@ func main() {
 	need_prepare_data := flag.Bool("need_prepare_data", false, "update 1000 object")
 	list_bucket := flag.Bool("list_bucket", false, "list bucket object")
 	prefix := flag.String("prefix", "", "list object, object prefix")
+	num_thread := flag.Int("num_thread", 3, "number of thread")
 
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "Usage of go-s3-tools:\n")
@@ -129,7 +129,7 @@ func main() {
 		file.Prepare_test_data(minioClient, bukcetName, filePath)
 	}
 
-	run(minioClient, bukcetName, filePath)
+	run(minioClient, bukcetName, filePath, *num_thread)
 
 	logrus.Infoln("finish op")
 }

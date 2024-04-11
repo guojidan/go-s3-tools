@@ -16,6 +16,8 @@ Usage of go-s3-tools:
         list bucket object
   -need_prepare_data
         update 1000 object
+  -num_thread int
+        number of thread (default 3)
   -prefix string
         list object, object prefix
   -secretAccessKey string
