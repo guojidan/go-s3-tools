@@ -1,0 +1,13 @@
+{
+    "EndPoint": "127.0.0.1:9000",
+	"AccessKeyID": "minioadmin",
+	"SecretAccessKey": "minioadmin",
+	"BukcetName": "testbucket",
+	"FilePath": "",
+	"Debug": true,
+	"Test": false,
+	"NeedPrepareData": false,
+	"ListBucket": true,
+	"Prefix": "",
+	"NumThread": 3
+}
